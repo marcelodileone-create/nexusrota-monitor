@@ -1,0 +1,58 @@
+name: NexusRota Monitors
+
+on:
+  schedule:
+    # GitHub's minimum granularity is 5 min (and runs can be delayed under load).
+    - cron: "*/5 * * * *"
+  workflow_dispatch: {} # allows manual "Run workflow" for testing
+
+concurrency:
+  # Serialize runs so scheduled + manual dispatches never race on the state commit.
+  group: nexusrota-monitors
+  cancel-in-progress: false
+
+permissions:
+  contents: write # needed to commit the updated state files back to the repo
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Operational monitor (Supabase)
+        env:
+          SUPABASE_CONN: ${{ secrets.SUPABASE_CONN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: "803022098"
+        run: node scripts/ops-monitor.mjs
+
+      - name: Vercel deploy monitor
+        # Don't let a Vercel/API hiccup fail the whole run or block the state commit.
+        continue-on-error: true
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: "803022098"
+        run: node scripts/vercel-monitor.mjs
+
+      - name: Persist state
+        if: always()
+        run: |
+          git config user.name "nexusrota-monitor[bot]"
+          git config user.email "nexusrota-monitor@users.noreply.github.com"
+          git add state/
+          if git diff --cached --quiet; then
+            echo "no state change"
+          else
+            git commit -m "chore: state update [skip ci]"
+            git push
+          fi

@@ -1,0 +1,14 @@
+{
+  "name": "nexusrota-monitor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "NexusRota operational + Vercel deploy monitors, running on GitHub Actions.",
+  "scripts": {
+    "ops": "node scripts/ops-monitor.mjs",
+    "vercel": "node scripts/vercel-monitor.mjs"
+  },
+  "dependencies": {
+    "pg": "^8.13.1"
+  }
+}

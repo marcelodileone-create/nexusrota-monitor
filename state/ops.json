@@ -1,0 +1,10 @@
+{
+  "initialized": true,
+  "orders_alerted": [],
+  "tx_alerted": [],
+  "wd_alerted": [],
+  "thread_alerted": [
+    "1edbaa22-835b-4678-89e4-de206596314c",
+    "426fb03f-bc08-4e77-99d6-954209ff8551"
+  ]
+}
