@@ -18,6 +18,8 @@ if (!token || !repo) throw new Error("set GH_TOKEN and GH_REPO");
 const secrets = {
   SUPABASE_CONN: process.env.SUPABASE_CONN,
   VERCEL_TOKEN: process.env.VERCEL_TOKEN,
+  VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
+  VERCEL_PROJECTS: process.env.VERCEL_PROJECTS,
   TELEGRAM_BOT_TOKEN: process.env.TELEGRAM_BOT_TOKEN,
 };
 

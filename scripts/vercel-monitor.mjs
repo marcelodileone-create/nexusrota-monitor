@@ -7,8 +7,13 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { sendTelegram } from "./lib/telegram.mjs";
 
-const TEAM_ID = "team_duVqOugTfq1CHgNNnX3gFptQ";
-const PROJECTS = ["nexusrota", "roteiro-japao-2027", "poatrade"];
+// Identifiers come from env (kept out of a public repo). Fallbacks keep local
+// dev working if you export them.
+const TEAM_ID = process.env.VERCEL_TEAM_ID || "";
+const PROJECTS = (process.env.VERCEL_PROJECTS || "")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
 const STATE_FILE = process.env.VERCEL_STATE_FILE || resolve("state/vercel.json");
 const FAIL_STATES = new Set(["ERROR"]);
 const MAX_REMEMBERED = 300;
@@ -43,6 +48,10 @@ function fmtTime(ms) {
 
 async function main() {
   const token = loadToken();
+  if (!TEAM_ID || PROJECTS.length === 0) {
+    console.log("VERCEL_TEAM_ID / VERCEL_PROJECTS not set — skipping deploy check");
+    return;
+  }
   const state = loadState();
   const alertedSet = new Set(state.alerted || []);
 
