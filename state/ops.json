@@ -3,5 +3,7 @@
   "orders_alerted": [],
   "tx_alerted": [],
   "wd_alerted": [],
-  "thread_alerted": []
+  "thread_alerted": [
+    "5c0fb7bb-7cdc-44cf-b5e6-cf0a43783b14"
+  ]
 }
